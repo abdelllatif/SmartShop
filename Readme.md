@@ -72,48 +72,20 @@ Elle gère un portefeuille de **plus de 650 clients professionnels** avec un sys
 
 ---
 
-## 📦 Dépendances Maven principales
+## 📦 Dépendances Maven
 
-```xml
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-    </dependency>
-    <!-- ou mysql-connector-j pour MySQL -->
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct</artifactId>
-        <version>1.5.5.Final</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.3.0</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-```
+| Dépendance                      | Description                                   | Obligatoire |
+|--------------------------------|-----------------------------------------------|-------------|
+| spring-boot-starter-web        | API REST, contrôleurs, endpoints HTTP         | ✅ Oui      |
+| spring-boot-starter-data-jpa   | ORM Hibernate + Repositories JPA              | ✅ Oui      |
+| spring-boot-starter-validation | Validation des DTO avec Jakarta Validation    | ✅ Oui      |
+| postgresql / mysql-connector-j | Driver Base de données                        | ✅ Oui      |
+| lombok                         | Réduction du boilerplate (Getters/Setters…)   | ✅ Oui      |
+| mapstruct                      | Mapping DTO ↔ Entities                        | ✅ Oui      |
+| spring-boot-starter-test       | JUnit 5 + Mockito pour les tests              | ✅ Oui      |
+| springfox / springdoc-openapi  | Documentation Swagger                         | ✅ Oui      |
+
+
 
 > Note : `jjwt` n’est **pas utilisé** (authentification par session uniquement)
 
