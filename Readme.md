@@ -1,16 +1,12 @@
+
 # SmartShop - API de Gestion Commerciale B2B
 
-**SmartShop** est une application backend REST (API uniquement) développée pour **MicroTech Maroc**, distributeur B2B de matériel informatique à Casablanca.  
-Elle permet de gérer un portefeuille de plus de **650 clients professionnels** avec :
+**SmartShop** est une API REST backend (sans interface graphique) développée pour **MicroTech Maroc**, distributeur B2B de matériel informatique basé à Casablanca.
 
-- un système de fidélité à remises progressives (BASIC → SILVER → GOLD → PLATINUM),
-- des commandes multi-produits,
-- des paiements fractionnés multi-moyens (Espèces, Chèque, Virement),
-- une traçabilité financière complète,
-- une authentification basée sur sessions HTTP.
+Elle gère un portefeuille de **plus de 650 clients professionnels** avec un système complet de fidélité, commandes multi-produits, paiements fractionnés et traçabilité financière totale.
 
-> **Aucune interface graphique n'est fournie.**  
-Les tests se font via **Postman** ou **Swagger UI**.
+> **Aucune interface graphique fournie**  
+> Tests via **Postman** ou **Swagger UI**
 
 ---
 
@@ -18,100 +14,147 @@ Les tests se font via **Postman** ou **Swagger UI**.
 
 ### 👥 Gestion des Clients
 - CRUD complet
-- Suivi automatique :
-  - nombre total de commandes
-  - montant cumulé
-- Mise à jour automatique du niveau de fidélité selon le total cumulé :
-  - BASIC → SILVER → GOLD → PLATINUM
+- Suivi automatique du nombre de commandes et du montant cumulé
+- Niveau de fidélité mis à jour automatiquement :
+  - `BASIC` → `SILVER` → `GOLD` → `PLATINUM`
 
 ### 📦 Gestion des Produits
 - CRUD complet
-- Soft delete pour préserver l’historique
-- Contrôle du stock avant validation de commande
+- Soft delete (suppression logique) pour préserver l'historique
+- Contrôle strict du stock avant validation de commande
 
 ### 🛒 Gestion des Commandes
 - Commandes multi-produits
-- Vérification du stock avant ajout
-- Application automatique :
-  - remise fidélité
-  - codes promo (ex. : `PROMO-XXXX`)
-- Calculs :
+- Vérification du stock en temps réel
+- Application automatique des remises :
+  - Remise selon niveau de fidélité du client
+  - Codes promo (ex: `PROMO-2025`)
+- Calculs automatiques :
   - Montant HT
-  - Remises
-  - TVA 20% (sur montant après remise)
-  - Montant TTC avec arrondi à 2 décimales
-- Statuts : `PENDING` → `CONFIRMED`, `CANCELED`, `REJECTED`
-- Historique immuable
+  - Remise appliquée
+  - TVA 20% (calculée après remise)
+  - Montant TTC arrondi à 2 décimales
+- Cycle de vie : `PENDING` → `CONFIRMED` | `CANCELED` | `REJECTED`
+- Historique immuable des commandes
 
 ### 💳 Paiements Fractionnés
-- Plusieurs paiements pour une seule commande
-- Multiples moyens :
+- Plusieurs paiements possibles par commande
+- Moyens de paiement supportés :
   - Espèces
   - Chèque
   - Virement bancaire
-- Limite légale : **20 000 DH par paiement**
+- Respect de la limite légale marocaine : **20 000 DH maximum par paiement**
 
 ### 🔐 Authentification & Sécurité
-- Sessions HTTP (login / logout)
-- Rôles :
-  - **ADMIN** → gestion complète
-  - **CLIENT** → accès uniquement à ses données
+- Authentification par **sessions HTTP** (login/logout)
+- Deux rôles :
+  | Rôle    | Droits                                      |
+  |---------|---------------------------------------------|
+  | ADMIN   | Accès complet à toute l'application         |
+  | CLIENT  | Accès uniquement à ses propres données     |
 
 ---
 
-## 🛠️ Technologies & Stack
+## 🛠️ Stack Technique
 
-- **Java 17**
-- **Spring Boot 3.x**
-- Spring Data JPA (Hibernate)
-- Spring Web MVC
-- PostgreSQL (ou MySQL)
-- MapStruct
-- Lombok
-- Bean Validation (Jakarta Validation)
-- JUnit 5 + Mockito
-- Swagger (SpringDoc ou SpringFox)
-
----
-
-## 📦 Dépendances Maven (noms uniquement)
-
-- `spring-boot-starter-web`
-- `spring-boot-starter-data-jpa`
-- `spring-boot-starter-validation`
-- `postgresql` *(ou `mysql-connector-j`)*  
-- `lombok`
-- `mapstruct`
-- `spring-boot-starter-test`
-- `modelmapper` *(optionnel)*
-- `jjwt-api` *(non utilisé — authentification par session)*
-- `springdoc-openapi-starter-webmvc-ui` *(ou springfox-swagger2 + swagger-ui)*
+| Technologie                      | Version / Remarque                  |
+|----------------------------------|-------------------------------------|
+| Java                             | 17                                  |
+| Spring Boot                      | 3.x                                 |
+| Spring Data JPA (Hibernate)      |                                     |
+| Spring Web MVC                   |                                     |
+| Base de données                  | PostgreSQL (ou MySQL)               |
+| MapStruct                        | Mapping DTO ↔ Entity                |
+| Lombok                           | Réduction du code boilerplate       |
+| Jakarta Bean Validation          | Validation des données              |
+| JUnit 5 + Mockito                | Tests unitaires & d'intégration     |
+| SpringDoc OpenAPI                | Documentation Swagger UI            |
 
 ---
 
-## 📁 Structure du Projet
+## 📦 Dépendances Maven principales
 
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+    </dependency>
+    <!-- ou mysql-connector-j pour MySQL -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>1.5.5.Final</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>2.3.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+> Note : `jjwt` n’est **pas utilisé** (authentification par session uniquement)
+
+---
+
+## 📁 Structure du projet
+
+```
 src/
 ├── main/
-│ ├── java/
-│ │ └── ma/microtech/smartshop/
-│ │ ├── config/ # Config, MapStruct, Swagger
-│ │ ├── controller/ # Endpoints REST
-│ │ ├── dto/ # Data Transfer Objects
-│ │ ├── entity/ # Entités JPA
-│ │ │ ├── User
-│ │ │ ├── Client
-│ │ │ ├── Product
-│ │ │ ├── Commande
-│ │ │ ├── OrderItem
-│ │ │ └── Paiement
-│ │ ├── enum/ # UserRole, CustomerTier, etc.
-│ │ ├── exception/ # Exceptions + ControllerAdvice
-│ │ ├── mapper/ # MapStruct mappers
-│ │ ├── repository/ # Interfaces JPA
-│ │ ├── service/ # Logique métier
-│ │ └── SmartShopApplication.java
-│ └── resources/
-│ ├── application.yml
-│ └── data.sql # Seed optionnel
-└── test/ # Tests unitaires 
+│   ├── java/ma/microtech/smartshop/
+│   │   ├── config/          # Config, MapStruct, Swagger
+│   │   ├── controller/      # Endpoints REST
+│   │   ├── dto/             # Data Transfer Objects
+│   │   ├── entity/          # Entités JPA
+│   │   │   ├── User.java
+│   │   │   ├── Client.java
+│   │   │   ├── Product.java
+│   │   │   ├── Commande.java
+│   │   │   ├── OrderItem.java
+│   │   │   └── Paiement.java
+│   │   ├── enum/            # UserRole, CustomerTier, PaymentMethod...
+│   │   ├── exception/       # Exceptions globales + ControllerAdvice
+│   │   ├── mapper/          # MapStruct mappers
+│   │   ├── repository/      # Interfaces JPA Repository
+│   │   ├── service/         # Logique métier
+│   │   └── SmartShopApplication.java
+│   └── resources/
+│       ├── application.yml
+│       └── data.sql         # Données de seed (optionnel)
+└── test/                    # Tests unitaires et d'intégration
+```
+
+---
+
+## 🚀 Lancement rapide
+
+
+- API accessible sur : `http://localhost:8080`
+- Swagger UI : `http://localhost:8080/swagger-ui.html`
+- API docs (OpenAPI) : `http://localhost:8080/v3/api-docs`
+
+---
+
