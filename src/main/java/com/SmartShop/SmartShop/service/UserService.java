@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserService {
     User register(User user);
-    Optional<User> login(String email, String password);
+    Optional<User> findByEmail(String email);
     List<User> getAllUsers();
     Optional<User> getUserById(Long id);
     User updateUser(User user);
