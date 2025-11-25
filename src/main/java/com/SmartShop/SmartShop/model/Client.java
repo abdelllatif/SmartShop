@@ -1,4 +1,4 @@
 package com.SmartShop.SmartShop.model;
 
-public class user {
+public class Client {
 }
