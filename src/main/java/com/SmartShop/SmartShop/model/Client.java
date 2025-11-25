@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
-    private CustomerTier niveauFidelite;
+    private CustomerTier niveauFidelite=CustomerTier.BASIC;
     @OneToOne(mappedBy = "client")
     private User user;
 }

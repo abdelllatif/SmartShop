@@ -1,5 +1,7 @@
 package com.SmartShop.SmartShop.service.impl;
 
+import com.SmartShop.SmartShop.enums.UserRole;
+import com.SmartShop.SmartShop.model.Client;
 import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.repository.UserRepository;
 import com.SmartShop.SmartShop.service.UserService;
@@ -23,17 +25,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (user.getRole() == UserRole.CLIENT) {
+            Client client = Client.builder().build();
+            client.setUser(user);
+            user.setClient(client);
+        }
+
         return userRepository.save(user);
     }
 
     @Override
     public Optional<User> login(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
-        if(userOpt.isPresent()) {
-            User user = userOpt.get();
-            if(passwordEncoder.matches(password, user.getPassword())) {
-                return Optional.of(user);
-            }
+        if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
+            return userOpt;
         }
         return Optional.empty();
     }
@@ -53,6 +59,7 @@ public class UserServiceImpl implements UserService {
         if(existing.isPresent()) {
             User u = existing.get();
             u.setEmail(user.getEmail());
+            u.setUsername(user.getUsername());
             if(user.getPassword() != null && !user.getPassword().isEmpty()) {
                 u.setPassword(passwordEncoder.encode(user.getPassword()));
             }
