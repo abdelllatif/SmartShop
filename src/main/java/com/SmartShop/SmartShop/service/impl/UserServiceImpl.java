@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         if (user.getRole() == UserRole.CLIENT) {
-            Client client = Client.builder().build();
+            Client client = new Client();
             client.setUser(user);
             user.setClient(client);
         }
