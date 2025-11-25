@@ -1,8 +1,8 @@
 package com.SmartShop.SmartShop.service.impl;
 
 import com.SmartShop.SmartShop.model.User;
-import com.SmartShop.SmartShop.repositories.UserRepository;
-import com.SmartShop.SmartShop.services.UserService;
+import com.SmartShop.SmartShop.repository.UserRepository;
+import com.SmartShop.SmartShop.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(User user) {
-        // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -47,5 +46,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public User updateUser(User user) {
+        Optional<User> existing = userRepository.findById(user.getId());
+        if(existing.isPresent()) {
+            User u = existing.get();
+            u.setEmail(user.getEmail());
+            if(user.getPassword() != null && !user.getPassword().isEmpty()) {
+                u.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+            u.setRole(user.getRole());
+            return userRepository.save(u);
+        }
+        throw new RuntimeException("User not found");
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }
