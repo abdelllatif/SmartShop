@@ -1,5 +1,6 @@
 package com.SmartShop.SmartShop.controller;
 
+import com.SmartShop.SmartShop.dto.LoginRequest;
 import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -21,8 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email,
-                                   @RequestParam String password,
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest,
                                    HttpSession session) {
 
         if (session.getAttribute("USER") != null) {
@@ -31,13 +31,13 @@ public class AuthController {
                     .body("You are already logged in.");
         }
 
-        Optional<User> userOpt = userService.findByEmail(email);
+        Optional<User> userOpt = userService.findByEmail(loginRequest.getEmail());
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found.");
         }
         User user = userOpt.get();
 
-        if (!BCrypt.checkpw(password, user.getPassword())) {
+        if (!BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password.");
         }
 
