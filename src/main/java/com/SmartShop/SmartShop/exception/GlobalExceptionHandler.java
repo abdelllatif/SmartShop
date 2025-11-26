@@ -28,5 +28,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleForbiddenException(ForbiddenException e){
         return ResponseEntity.status(403).body(e.getMessage());
     }
-
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity handleException(Exception e){
+        return ResponseEntity.status(500).body(e.getMessage());
+    }
 }
