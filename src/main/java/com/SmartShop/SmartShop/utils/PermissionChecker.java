@@ -6,29 +6,21 @@ import jakarta.servlet.http.HttpSession;
 
 public class PermissionChecker {
 
-    public static boolean hasRole(HttpSession session, String role){
-        User user = (User) session.getAttribute("USER");
-        if (user == null) return false;
-        return user.getRole().equals(role);
-    }
     public static boolean canPerform(HttpSession session, String action) {
         User user = (User) session.getAttribute("USER");
         if (user == null) return false;
-
-        if (user.getRole().equals(UserRole.ADMIN.toString())) {
+        if (user.getRole() == UserRole.ADMIN) {
             return true;
         }
-        if (user.getRole().equals(UserRole.CLIENT.toString())) {
-            return action.equalsIgnoreCase("READ"); // client → read only
+        if (user.getRole() == UserRole.CLIENT) {
+            return action.equalsIgnoreCase("READ");
         }
-
         return false;
     }
-
     public static boolean canAccessResource(HttpSession session, Long ownerId) {
         User user = (User) session.getAttribute("USER");
         if (user == null) return false;
-        if (user.getRole().equals(UserRole.ADMIN.toString())) {
+        if (user.getRole() == UserRole.ADMIN) {
             return true;
         }
         return user.getId().equals(ownerId);

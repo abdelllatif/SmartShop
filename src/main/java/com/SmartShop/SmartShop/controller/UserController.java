@@ -3,6 +3,8 @@ package com.SmartShop.SmartShop.controller;
 import com.SmartShop.SmartShop.enums.UserRole;
 import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.service.UserService;
+import com.SmartShop.SmartShop.utils.PermissionChecker;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,13 +15,16 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) {
+    private final HttpSession session;
+    public UserController(UserService userService, HttpSession session) {
         this.userService = userService;
+        this.session = session;
     }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
+        PermissionChecker.canPerform(session,"CREATE");
+
         return userService.register(user);
     }
 
