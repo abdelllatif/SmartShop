@@ -1,5 +1,6 @@
 package com.SmartShop.SmartShop.model;
 
+import com.SmartShop.SmartShop.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,5 +17,5 @@ public class Product {
     private double prixUnitaire;
     private int stockDisponible;
 
-
+    private ProductStatus status = ProductStatus.ACTIVE;
 }
