@@ -23,18 +23,28 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
-        PermissionChecker.canPerform(session,"CREATE");
-
+        if(!PermissionChecker.canPerform(session,"CREATE")){
+            throw new RuntimeException("Unauthorized");
+        }
         return userService.register(user);
+    }
+
+    @GetMapping("/me")
+    public User getCurrentUser() {
+        if(session.getAttribute("USER")==null) throw new RuntimeException("User not logged in");
+        return (User) session.getAttribute("USER");
     }
 
     @GetMapping
     public List<User> getAllUsers() {
+        PermissionChecker.canPerform(session,"READ_ALL");
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
+        PermissionChecker.canPerform(session,"READ");
+        PermissionChecker.canAccessResource(session,id);
         Optional<User> userOpt = userService.getUserById(id);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("User not found");
@@ -44,12 +54,14 @@ public class UserController {
 
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        PermissionChecker.canPerform(session,"UPDATE");
         updatedUser.setId(id);
         return userService.updateUser(updatedUser);
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
+        PermissionChecker.canPerform(session,"DELETE");
         userService.deleteUser(id);
         return "User deleted successfully";
     }
