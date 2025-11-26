@@ -10,6 +10,7 @@ import com.SmartShop.SmartShop.repository.UserRepository;
 import com.SmartShop.SmartShop.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,15 +29,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse register(UserRequest request) {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         if (user.getRole() == UserRole.CLIENT) {
             Client client = new Client();
             client.setUser(user);
             user.setClient(client);
         }
-        User savedUser = userRepository.save(user);
+
+        User savedUser = userRepository.save(user); // save with cascade
         return userMapper.toUserResponse(savedUser);
     }
 
