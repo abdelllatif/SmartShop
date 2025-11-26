@@ -1,6 +1,9 @@
 package com.SmartShop.SmartShop.service.impl;
 
+import com.SmartShop.SmartShop.dto.UserRequest;
+import com.SmartShop.SmartShop.dto.UserResponse;
 import com.SmartShop.SmartShop.enums.UserRole;
+import com.SmartShop.SmartShop.mapper.UserMapper;
 import com.SmartShop.SmartShop.model.Client;
 import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.repository.UserRepository;
@@ -16,23 +19,25 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.userMapper = userMapper;
     }
 
     @Override
-    public User register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+    public UserResponse register(UserRequest request) {
+        User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         if (user.getRole() == UserRole.CLIENT) {
             Client client = new Client();
             client.setUser(user);
             user.setClient(client);
         }
-
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserResponse(savedUser);
     }
 
 
@@ -46,21 +51,22 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id);
     }
 
-    public User updateUser(User user) {
-        Optional<User> existing = userRepository.findById(user.getId());
-        if(existing.isPresent()) {
-            User u = existing.get();
-            u.setEmail(user.getEmail());
-            u.setUsername(user.getUsername());
-            if(user.getPassword() != null && !user.getPassword().isEmpty()) {
-                u.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
-            u.setRole(user.getRole());
-            return userRepository.save(u);
+    @Override
+    public User updateUser(Long id, UserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        throw new RuntimeException("User not found");
+        user.setRole(request.getRole());
+
+        return userRepository.save(user);
     }
 
+    @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
@@ -69,6 +75,5 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-
 
 }

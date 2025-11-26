@@ -1,5 +1,7 @@
 package com.SmartShop.SmartShop.controller;
 
+import com.SmartShop.SmartShop.dto.UserRequest;
+import com.SmartShop.SmartShop.dto.UserResponse;
 import com.SmartShop.SmartShop.exception.ForbiddenException;
 import com.SmartShop.SmartShop.exception.NotFoundException;
 import com.SmartShop.SmartShop.exception.UnauthorizedException;
@@ -7,6 +9,8 @@ import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.service.UserService;
 import com.SmartShop.SmartShop.utils.PermissionChecker;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +27,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity createUser(@RequestBody @Valid UserRequest user) {
         if(!PermissionChecker.canPerform(session,"CREATE")){
             throw new ForbiddenException("You are not allowed to create users");
         }
-        return userService.register(user);
+        UserResponse newuser= userService.register(user);
+        return ResponseEntity.ok(newuser);
     }
 
     @GetMapping("/me")
@@ -55,13 +60,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public User updateUser(@PathVariable Long id, @RequestBody UserRequest updatedUser) {
         if(!PermissionChecker.canPerform(session,"UPDATE")){
             throw new ForbiddenException("Access denied");
         }
-        updatedUser.setId(id);
-        return userService.updateUser(updatedUser);
+        return userService.updateUser(id, updatedUser);  // pass id separately
     }
+
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {

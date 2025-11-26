@@ -1,6 +1,7 @@
 package com.SmartShop.SmartShop.dto;
 
 import com.SmartShop.SmartShop.enums.UserRole;
+import com.SmartShop.SmartShop.model.Client;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,4 +22,9 @@ public class UserRequest {
     private String password;
 
     private UserRole role;
+
+    private Client client;
+
+
+
 }
