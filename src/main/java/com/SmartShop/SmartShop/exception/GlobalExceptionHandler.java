@@ -16,4 +16,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleNotFoundException(NotFoundException e){
         return ResponseEntity.status(404).body(e.getMessage());
     }
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity handleUnauthorizedException(UnauthorizedException e){
+        return ResponseEntity.status(401).body(e.getMessage());
+    }
 }
