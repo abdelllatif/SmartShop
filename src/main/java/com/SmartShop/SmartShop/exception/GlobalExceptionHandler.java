@@ -20,4 +20,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleUnauthorizedException(UnauthorizedException e){
         return ResponseEntity.status(401).body(e.getMessage());
     }
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity handleBusinessException(BusinessException e){
+        return ResponseEntity.status(409).body(e.getMessage());
+    }
 }
