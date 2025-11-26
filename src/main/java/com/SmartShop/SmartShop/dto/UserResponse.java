@@ -1,6 +1,7 @@
 package com.SmartShop.SmartShop.dto;
 
 import com.SmartShop.SmartShop.enums.UserRole;
+import com.SmartShop.SmartShop.model.Client;
 import lombok.Data;
 
 @Data
@@ -9,4 +10,5 @@ public class UserResponse {
     private String username;
     private String email;
     private UserRole role;
+    private Client client;
 }
