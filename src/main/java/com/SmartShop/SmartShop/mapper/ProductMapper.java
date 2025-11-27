@@ -1,12 +1,16 @@
 package com.SmartShop.SmartShop.mapper;
 
-
+import com.SmartShop.SmartShop.dto.ProductRequest;
+import com.SmartShop.SmartShop.dto.ProductResponse;
 import com.SmartShop.SmartShop.model.Product;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
+public interface ProductMapper {
 
-public interface ProductMapper  {
 
-    public Product toProduct(Product product);
+    Product toProduct(ProductRequest request);
+    ProductResponse toProductResponse(Product product);
+
 }
