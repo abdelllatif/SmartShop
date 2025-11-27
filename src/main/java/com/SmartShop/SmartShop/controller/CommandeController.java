@@ -6,6 +6,8 @@ import com.SmartShop.SmartShop.exception.ForbiddenException;
 import com.SmartShop.SmartShop.service.CommandeService;
 import com.SmartShop.SmartShop.utils.PermissionChecker;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -25,4 +27,12 @@ public class CommandeController {
         }
         return commandeService.createCommande(request);
     }
+    @GetMapping("/{id}")
+    public CommandeResponse getCommande(@PathVariable Long id) {
+        if (!PermissionChecker.canPerform(session, "READ")) {
+            throw new ForbiddenException("Access denied");
+        }
+        return commandeService.getCommande(id);
+    }
+
 }
