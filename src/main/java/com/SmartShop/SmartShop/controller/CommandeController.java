@@ -2,7 +2,10 @@ package com.SmartShop.SmartShop.controller;
 
 import com.SmartShop.SmartShop.dto.CommandeRequest;
 import com.SmartShop.SmartShop.dto.CommandeResponse;
+import com.SmartShop.SmartShop.enums.OrderStatus;
 import com.SmartShop.SmartShop.exception.ForbiddenException;
+import com.SmartShop.SmartShop.exception.NotFoundException;
+import com.SmartShop.SmartShop.model.Commande;
 import com.SmartShop.SmartShop.service.CommandeService;
 import com.SmartShop.SmartShop.utils.PermissionChecker;
 import jakarta.servlet.http.HttpSession;
@@ -57,4 +60,16 @@ public class CommandeController {
         }
         commandeService.deleteCommande(id);
     }
+
+     @PutMapping("/{id}/status")
+     public CommandeResponse updateCommandeStatus(@PathVariable Long id,
+                                                  @RequestParam OrderStatus status) {
+
+         if (!PermissionChecker.canPerform(session, "UPDATE")) {
+             throw new ForbiddenException("Accès refusé");
+         }
+
+         return commandeService.updateCommandeStatus(id, status);
+     }
+
 }

@@ -2,6 +2,8 @@ package com.SmartShop.SmartShop.service;
 
 import com.SmartShop.SmartShop.dto.CommandeRequest;
 import com.SmartShop.SmartShop.dto.CommandeResponse;
+import com.SmartShop.SmartShop.enums.OrderStatus;
+import com.SmartShop.SmartShop.model.Commande;
 
 import java.util.List;
 
@@ -17,5 +19,7 @@ public interface CommandeService {
 
     void deleteCommande(Long id);
 
-    List<CommandeResponse> getCommandesByClientId(Long id);
+    List<CommandeResponse> getAllCommandesByClientId(Long id);
+
+    CommandeResponse updateCommandeStatus(Long id, OrderStatus status);
 }

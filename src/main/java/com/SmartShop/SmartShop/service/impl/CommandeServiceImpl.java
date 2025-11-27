@@ -2,14 +2,12 @@ package com.SmartShop.SmartShop.service.impl;
 
 import com.SmartShop.SmartShop.dto.CommandeRequest;
 import com.SmartShop.SmartShop.dto.CommandeResponse;
+import com.SmartShop.SmartShop.enums.CustomerTier;
 import com.SmartShop.SmartShop.enums.OrderStatus;
 import com.SmartShop.SmartShop.enums.PromoStatus;
+import com.SmartShop.SmartShop.exception.NotFoundException;
 import com.SmartShop.SmartShop.mapper.CommandeMapper;
-import com.SmartShop.SmartShop.model.Client;
-import com.SmartShop.SmartShop.model.Commande;
-import com.SmartShop.SmartShop.model.OrderItem;
-import com.SmartShop.SmartShop.model.Product;
-import com.SmartShop.SmartShop.model.PromoCode;
+import com.SmartShop.SmartShop.model.*;
 import com.SmartShop.SmartShop.repository.ClientRepository;
 import com.SmartShop.SmartShop.repository.CommandeRepository;
 import com.SmartShop.SmartShop.repository.ProductRepository;
@@ -127,7 +125,42 @@ public class CommandeServiceImpl implements CommandeService {
 
 
     @Override
-    public List<CommandeResponse> getCommandesByClientId(Long id){
+    public List<CommandeResponse> getAllCommandesByClientId(Long id){
         return commandeRepository.findByClientId(id).stream().map(commandeMapper::toCommandeResponse).collect(Collectors.toList());
     }
+
+    @Override
+    public CommandeResponse updateCommandeStatus(Long id, OrderStatus status) {
+
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Commande introuvable"));
+
+        if (status.equals(OrderStatus.CONFIRMED)) {
+
+            List<CommandeResponse> commandes =
+                    this.getAllCommandesByClientId(commande.getClient().getId());
+
+            Client client = clientRepository.findById(commande.getClient().getId())
+                    .orElseThrow(() -> new NotFoundException("Client introuvable"));
+
+            int size = commandes.size();
+            double amount = commande.getSousTotal();
+
+            if (size > 20 || amount > 15000) {
+                client.setNiveauFidelite(CustomerTier.PLATINUM);
+            } else if (size > 10 || amount > 5000) {
+                client.setNiveauFidelite(CustomerTier.SILVER);
+            } else if (size > 3 || amount > 1000) {
+                client.setNiveauFidelite(CustomerTier.GOLD);
+            }
+
+            clientRepository.save(client);
+        }
+
+        commande.setStatut(status);
+        commandeRepository.save(commande);
+
+        return commandeMapper.toCommandeResponse(commande);
+    }
+
 }
