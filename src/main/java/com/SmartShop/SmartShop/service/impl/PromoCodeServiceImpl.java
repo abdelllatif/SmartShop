@@ -27,6 +27,9 @@ public class PromoCodeServiceImpl implements PromoCodeService {
                 .build();
         return promoCodeRepository.save(promoCode);
     }
+   public PromoCode findByCodeAndStatus(String code, PromoStatus status){
+        return promoCodeRepository.findByCodeAndStatus(code, status).orElse(null);
+    };
 
     @Override
     @Transactional
