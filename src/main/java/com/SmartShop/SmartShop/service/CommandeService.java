@@ -1,0 +1,19 @@
+package com.SmartShop.SmartShop.service;
+
+import com.SmartShop.SmartShop.dto.CommandeRequest;
+import com.SmartShop.SmartShop.dto.CommandeResponse;
+
+import java.util.List;
+
+public interface CommandeService {
+
+    CommandeResponse createCommande(CommandeRequest request);
+
+    CommandeResponse getCommande(Long id);
+
+    List<CommandeResponse> getAllCommandes();
+
+    CommandeResponse updateCommande(Long id, CommandeRequest request);
+
+    void deleteCommande(Long id);
+}
