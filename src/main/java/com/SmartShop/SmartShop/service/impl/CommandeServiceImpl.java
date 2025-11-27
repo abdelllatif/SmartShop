@@ -15,6 +15,7 @@ import com.SmartShop.SmartShop.repository.CommandeRepository;
 import com.SmartShop.SmartShop.repository.ProductRepository;
 import com.SmartShop.SmartShop.service.CommandeService;
 import com.SmartShop.SmartShop.service.PromoCodeService;
+import com.SmartShop.SmartShop.utils.PromoCodeGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,7 +90,7 @@ public class CommandeServiceImpl implements CommandeService {
         commande.setSousTotal(sousTotal);
         commande.setTotal(total);
         commande.setMontantRestant(total);
-        promoCodeService.createPromoCode(client, "PROMO-" + Math.random(6));
+        promoCodeService.createPromoCode(client, "PROMO-" + PromoCodeGenerator.generatePromoCode(8));
 
         Commande saved = commandeRepository.save(commande);
         return commandeMapper.toCommandeResponse(saved);
