@@ -17,7 +17,5 @@ public class ProductRequest {
 
     @Min(value = 0, message = "Stock must be at least 0")
     private int stockDisponible;
-
-    @NotNull(message = "Status is required")
     private ProductStatus status;
 }

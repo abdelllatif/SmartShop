@@ -1,62 +1,83 @@
 package com.SmartShop.SmartShop.service.impl;
 
+import com.SmartShop.SmartShop.dto.ProductRequest;
+import com.SmartShop.SmartShop.dto.ProductResponse;
 import com.SmartShop.SmartShop.enums.ProductStatus;
+import com.SmartShop.SmartShop.exception.NotFoundException;
+import com.SmartShop.SmartShop.mapper.ProductMapper;
 import com.SmartShop.SmartShop.model.Product;
 import com.SmartShop.SmartShop.repository.ProductRepository;
 import com.SmartShop.SmartShop.service.ProductService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     @Override
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponse createProduct(ProductRequest request) {
+        Product product = productMapper.toProduct(request);
+        if (product.getStatus() == null) {
+            product.setStatus(ProductStatus.ACTIVE);
+        }
+        Product saved = productRepository.save(product);
+        return productMapper.toProductResponse(saved);
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(productMapper::toProductResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public ProductResponse getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        return productMapper.toProductResponse(product);
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        existing.setName(product.getName());
-        existing.setPrixUnitaire(product.getPrixUnitaire());
-        return productRepository.save(existing);
-    }
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
-    @Override
-    public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        existing.setName(request.getName());
+        existing.setPrixUnitaire(request.getPrixUnitaire());
+        existing.setStockDisponible(request.getStockDisponible());
+        if (request.getStatus() != null) {
+            existing.setStatus(request.getStatus());
+        }
+
+        Product updated = productRepository.save(existing);
+        return productMapper.toProductResponse(updated);
     }
 
     @Override
     public void suspendProduct(Long id) {
-        productRepository.updateProductStatus(id, ProductStatus.SPANNED);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+        product.setStatus(ProductStatus.SPANNED);
+        productRepository.save(product);
     }
 
     @Override
-    public List<Product> getActiveProducts() {
-        return productRepository.findByStatus(ProductStatus.ACTIVE);
+    public List<ProductResponse> getActiveProducts() {
+        return productRepository.findByStatus(ProductStatus.ACTIVE)
+                .stream()
+                .map(productMapper::toProductResponse)
+                .collect(Collectors.toList());
     }
-
-
-
 }

@@ -1,5 +1,7 @@
 package com.SmartShop.SmartShop.controller;
 
+import com.SmartShop.SmartShop.dto.ProductRequest;
+import com.SmartShop.SmartShop.dto.ProductResponse;
 import com.SmartShop.SmartShop.exception.ForbiddenException;
 import com.SmartShop.SmartShop.model.Product;
 import com.SmartShop.SmartShop.service.ProductService;
@@ -22,15 +24,15 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
+    public ProductResponse createProduct(@RequestBody ProductRequest request) {
         if (!PermissionChecker.canPerform(session, "CREATE")) {
             throw new ForbiddenException("Only ADMIN can create products");
         }
-        return productService.createProduct(product);
+        return productService.createProduct(request);
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         if (!PermissionChecker.canPerform(session, "READ")) {
             throw new ForbiddenException("Access denied");
         }
@@ -38,9 +40,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable Long id) {
-        Product product = productService.getProductById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public ProductResponse getProduct(@PathVariable Long id) {
+        ProductResponse product = productService.getProductById(id);
         if (!PermissionChecker.canAccessResource(session, product.getId())) {
             throw new ForbiddenException("Access denied");
         }
@@ -48,11 +49,11 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    public ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
         if (!PermissionChecker.canPerform(session, "UPDATE")) {
             throw new ForbiddenException("Only ADMIN can update products");
         }
-        return productService.updateProduct(id, product);
+        return productService.updateProduct(id, request);
     }
 
     @DeleteMapping("/{id}")
@@ -64,7 +65,7 @@ public class ProductController {
     }
 
     @GetMapping("/active")
-    public List<Product> getActiveProducts() {
+    public List<ProductResponse> getActiveProducts() {
         return productService.getActiveProducts();
     }
 }

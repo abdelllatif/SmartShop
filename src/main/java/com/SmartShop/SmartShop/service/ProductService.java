@@ -1,19 +1,21 @@
 package com.SmartShop.SmartShop.service;
 
-import com.SmartShop.SmartShop.model.Product;
+import com.SmartShop.SmartShop.dto.ProductRequest;
+import com.SmartShop.SmartShop.dto.ProductResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductService {
-    Product createProduct(Product product);
-    List<Product> getAllProducts();
-    Optional<Product> getProductById(Long id);
-    Product updateProduct(Long id, Product product);
-    void deleteProduct(Long id);
 
-    //here I will use the method that I created in ProductRepository
+    ProductResponse createProduct(ProductRequest request);
+
+    List<ProductResponse> getAllProducts();
+
+    ProductResponse getProductById(Long id);
+
+    ProductResponse updateProduct(Long id, ProductRequest request);
+
     void suspendProduct(Long id);
 
-    List<Product> getActiveProducts();
+    List<ProductResponse> getActiveProducts();
 }
