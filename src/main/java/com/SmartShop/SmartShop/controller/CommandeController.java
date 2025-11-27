@@ -49,5 +49,11 @@ public class CommandeController {
         return commandeService.updateCommande(id, request);
     }
 
-
+    @DeleteMapping("/{id}")
+    public void deleteCommande(@PathVariable Long id) {
+        if (!PermissionChecker.canPerform(session, "DELETE")) {
+            throw new ForbiddenException("Access denied");
+        }
+        commandeService.deleteCommande(id);
+    }
 }
