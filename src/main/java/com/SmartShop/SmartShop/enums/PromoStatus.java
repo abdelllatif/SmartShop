@@ -1,4 +1,6 @@
 package com.SmartShop.SmartShop.enums;
 
-public class PromoStatus {
+public enum PromoStatus {
+    ACTIVE,
+    EXPIRE
 }
