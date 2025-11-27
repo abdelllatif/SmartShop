@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 public class CommandeController {
     private final CommandeService commandeService;
     private final HttpSession session;
@@ -34,5 +36,11 @@ public class CommandeController {
         }
         return commandeService.getCommande(id);
     }
-
+    @GetMapping
+    public List<CommandeResponse> getAllCommandes() {
+        if (!PermissionChecker.canPerform(session, "READ")) {
+            throw new ForbiddenException("Access denied");
+        }
+        return commandeService.getAllCommandes();
+    }
 }
