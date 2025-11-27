@@ -10,11 +10,13 @@ import org.mapstruct.Mapping;
 public interface CommandeMapper {
 
     @Mapping(source = "client.id", target = "clientId")
-    @Mapping(source = "listeArticles", target = "orderItems")
+    @Mapping(source = "listeArticles", target = "listeArticles")
     CommandeResponse toCommandeResponse(Commande commande);
 
-    @Mapping(source = "produit.id", target = "productId")
-    @Mapping(source = "produit.prixUnitaire", target = "prixUnitaire")
+    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.prixUnitaire", target = "prixUnitaire")
     @Mapping(source = "total", target = "total")
+    @Mapping(source = "quantity", target = "quantity")
     OrderItemResponse toOrderItemResponse(OrderItem orderItem);
 }
+

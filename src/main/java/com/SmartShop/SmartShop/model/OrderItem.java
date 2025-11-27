@@ -15,13 +15,13 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
-    private Product produit;
+    private Product product;
 
-    private int quantite;
+    private int quantity;
 
     private double prixUnitaire;
 
-    private double totalLigne;
+    private double total;
 
     @ManyToOne
     private Commande commande;
