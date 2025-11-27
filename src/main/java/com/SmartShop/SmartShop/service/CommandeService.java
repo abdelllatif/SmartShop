@@ -16,4 +16,6 @@ public interface CommandeService {
     CommandeResponse updateCommande(Long id, CommandeRequest request);
 
     void deleteCommande(Long id);
+
+    List<CommandeResponse> getCommandesByClientId(Long id);
 }

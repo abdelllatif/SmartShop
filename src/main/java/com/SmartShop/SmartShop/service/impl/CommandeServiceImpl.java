@@ -124,4 +124,10 @@ public class CommandeServiceImpl implements CommandeService {
     public void deleteCommande(Long id) {
         commandeRepository.deleteById(id);
     }
+
+
+    @Override
+    public List<CommandeResponse> getCommandesByClientId(Long id){
+        return commandeRepository.findByClientId(id).stream().map(commandeMapper::toCommandeResponse).collect(Collectors.toList());
+    }
 }

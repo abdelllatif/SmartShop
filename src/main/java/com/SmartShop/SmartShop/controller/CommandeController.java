@@ -9,7 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+ @RestController
+ @RequestMapping("/api/commandes")
 public class CommandeController {
     private final CommandeService commandeService;
     private final HttpSession session;
