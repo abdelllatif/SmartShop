@@ -13,8 +13,8 @@ public interface CommandeMapper {
     @Mapping(source = "listeArticles", target = "orderItems")
     CommandeResponse toCommandeResponse(Commande commande);
 
-    @Mapping(source = "produit.id", target = "productId") // <-- هنا استعمل الاسم الصحيح ديال الحقل فالـ Entity
-    @Mapping(source = "produit.prixUnitaire", target = "prixUnitaire") // إذا بغيت الثمن من الـ Product
+    @Mapping(source = "produit.id", target = "productId")
+    @Mapping(source = "produit.prixUnitaire", target = "prixUnitaire")
     @Mapping(source = "total", target = "total")
     OrderItemResponse toOrderItemResponse(OrderItem orderItem);
 }
