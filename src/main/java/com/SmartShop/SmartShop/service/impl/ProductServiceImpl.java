@@ -1,5 +1,6 @@
 package com.SmartShop.SmartShop.service.impl;
 
+import com.SmartShop.SmartShop.enums.ProductStatus;
 import com.SmartShop.SmartShop.model.Product;
 import com.SmartShop.SmartShop.repository.ProductRepository;
 import com.SmartShop.SmartShop.service.ProductService;
@@ -44,6 +45,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public void suspendProduct(Long id) {
+        productRepository.updateProductStatus(id, ProductStatus.SPANNED);
+    }
+
+    @Override
+    public List<Product> getActiveProducts() {
+        return productRepository.findByStatus(ProductStatus.ACTIVE);
     }
 
 
