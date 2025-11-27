@@ -6,10 +6,7 @@ import com.SmartShop.SmartShop.exception.ForbiddenException;
 import com.SmartShop.SmartShop.service.CommandeService;
 import com.SmartShop.SmartShop.utils.PermissionChecker;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,4 +40,14 @@ public class CommandeController {
         }
         return commandeService.getAllCommandes();
     }
+
+    @PutMapping("/{id}")
+    public CommandeResponse updateCommande(@PathVariable Long id, @RequestBody CommandeRequest request) {
+        if (!PermissionChecker.canPerform(session, "UPDATE")) {
+            throw new ForbiddenException("Access denied");
+        }
+        return commandeService.updateCommande(id, request);
+    }
+
+
 }
