@@ -58,8 +58,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         payementRepository.save(payement);
-
-        // Update commande montantRestant
         commande.setMontantRestant(montantRestant - request.getMontant());
         commandeRepository.save(commande);
 
@@ -79,8 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
         response.setId(payement.getId());
         response.setCommandeId(payement.getCommande().getId());
         response.setMontant(payement.getMontant());
-        response.setTypePaiement(payement.getTypePaiement().equalsIgnoreCase("CHEQUE") ? com.SmartShop.SmartShop.enums.PaymentType.CHEQUE :
-                com.SmartShop.SmartShop.enums.PaymentType.VIREMENT); // adjust if multiple types
+        response.setTypePaiement(payement.getTypePaiement().equalsIgnoreCase("CHEQUE") ? com.SmartShop.SmartShop.enums.PaymentType.CHEQUE : com.SmartShop.SmartShop.enums.PaymentType.VIREMENT);
         response.setDatePaiement(payement.getDatePaiement());
         response.setStatutPaiement(payement.getStatutPaiement());
         return response;
