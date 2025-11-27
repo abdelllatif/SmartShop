@@ -56,10 +56,15 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public void suspend(@PathVariable Long id) {
         if (!PermissionChecker.canPerform(session, "DELETE")) {
-            throw new ForbiddenException("Only ADMIN can delete products");
+            throw new ForbiddenException("Access denied");
         }
-        productService.deleteProduct(id);
+        productService.suspendProduct(id);
+    }
+
+    @GetMapping("/active")
+    public List<Product> getActiveProducts() {
+        return productService.getActiveProducts();
     }
 }
