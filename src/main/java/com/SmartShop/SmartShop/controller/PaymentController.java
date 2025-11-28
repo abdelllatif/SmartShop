@@ -2,6 +2,7 @@ package com.SmartShop.SmartShop.controller;
 
 import com.SmartShop.SmartShop.dto.PaymentRequest;
 import com.SmartShop.SmartShop.dto.PaymentResponse;
+import com.SmartShop.SmartShop.enums.PaymentStatus;
 import com.SmartShop.SmartShop.exception.ForbiddenException;
 import com.SmartShop.SmartShop.service.PaymentService;
 import com.SmartShop.SmartShop.utils.PermissionChecker;
@@ -37,4 +38,19 @@ public class PaymentController {
         }
         return paymentService.getPaymentsByCommande(commandeId);
     }
+
+
+
+    @PutMapping("/{paymentId}/status")
+    public PaymentResponse updatePaymentStatus(
+            @PathVariable Long paymentId,
+            @RequestParam PaymentStatus status) {
+
+        if (!PermissionChecker.canPerform(session, "UPDATE")) {
+            throw new ForbiddenException("Accès refusé");
+        }
+
+        return paymentService.updatePaymentStatus(paymentId, status);
+    }
+
 }

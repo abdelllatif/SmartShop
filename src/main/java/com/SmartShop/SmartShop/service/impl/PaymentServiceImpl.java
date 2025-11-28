@@ -2,6 +2,7 @@ package com.SmartShop.SmartShop.service.impl;
 
 import com.SmartShop.SmartShop.dto.PaymentRequest;
 import com.SmartShop.SmartShop.dto.PaymentResponse;
+import com.SmartShop.SmartShop.enums.OrderStatus;
 import com.SmartShop.SmartShop.enums.PaymentStatus;
 import com.SmartShop.SmartShop.exception.BadRequestException;
 import com.SmartShop.SmartShop.exception.NotFoundException;
@@ -34,36 +35,56 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse createPayment(PaymentRequest request) {
-
         Commande commande = commandeRepository.findById(request.getCommandeId())
                 .orElseThrow(() -> new NotFoundException("Commande introuvable"));
-
-        double totalPaid = payementRepository.findByCommandeId(commande.getId())
-                .stream()
-                .mapToDouble(Payement::getMontant)
-                .sum();
-
-        double montantRestant = commande.getTotal() - totalPaid;
-
-        if (montantRestant <= 0) {
+        if (commande.getMontantRestant() <= 0) {
             throw new BadRequestException("Cette commande est déjà complètement payée.");
         }
-
-        if (request.getMontant() > montantRestant) {
-            throw new BadRequestException("Le montant dépasse le montant restant à payer: " + montantRestant);
+        if (request.getMontant() <= 0) {
+            throw new BadRequestException("Le montant doit être supérieur à zéro.");
         }
 
         Payement payement = paymentMapper.toPayement(request);
         payement.setCommande(commande);
         payement.setDatePaiement(LocalDate.now());
-        payement.setStatutPaiement(PaymentStatus.COMPLETE);
+        payement.setStatutPaiement(PaymentStatus.EN_ATTENTE);
 
         Payement savedPayment = payementRepository.save(payement);
-        commande.setMontantRestant(montantRestant - request.getMontant());
-        commandeRepository.save(commande);
+        return paymentMapper.toPaymentResponse(savedPayment);
+    }
+
+
+
+    @Override
+    public PaymentResponse updatePaymentStatus(Long paymentId, PaymentStatus status) {
+        Payement payement = payementRepository.findById(paymentId)
+                .orElseThrow(() -> new NotFoundException("Paiement introuvable"));
+
+        payement.setStatutPaiement(status);
+        Payement savedPayment = payementRepository.save(payement);
+
+        if (status == PaymentStatus.COMPLETE) {
+            Commande commande = payement.getCommande();
+
+            double totalPaid = payementRepository.findByCommandeId(commande.getId())
+                    .stream()
+                    .filter(p -> p.getStatutPaiement() == PaymentStatus.COMPLETE)
+                    .mapToDouble(Payement::getMontant)
+                    .sum();
+
+            double montantRestant = commande.getTotal() - totalPaid;
+            commande.setMontantRestant(montantRestant);
+            if (montantRestant <= 0) {
+                commande.setStatut(OrderStatus.CONFIRMED);
+            }
+
+            commandeRepository.save(commande);
+        }
 
         return paymentMapper.toPaymentResponse(savedPayment);
     }
+
+
 
     @Override
     public List<PaymentResponse> getPaymentsByCommande(Long commandeId) {

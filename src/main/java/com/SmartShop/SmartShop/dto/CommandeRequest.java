@@ -16,8 +16,6 @@ public class CommandeRequest {
     @NotEmpty(message = "At least one order item is required")
     private List<OrderItemRequest> listeArticles;
 
-    private double remise;
-    private double tva;
     private String codePromo;
 
     private OrderStatus statut;

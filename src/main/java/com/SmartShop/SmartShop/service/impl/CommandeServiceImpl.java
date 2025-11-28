@@ -45,45 +45,61 @@ public class CommandeServiceImpl implements CommandeService {
     @Override
     @Transactional
     public CommandeResponse createCommande(CommandeRequest request) {
-
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
         Commande commande = new Commande();
         commande.setClient(client);
         commande.setDate(LocalDate.now());
-        commande.setTva(request.getTva());
-        commande.setStatut(request.getStatut() != null ? request.getStatut() : OrderStatus.PENDING);
 
         List<OrderItem> items = request.getListeArticles().stream().map(itemReq -> {
             Product product = productRepository.findById(itemReq.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
-
+            if (product.getStockDisponible() < itemReq.getQuantity()) throw new RuntimeException("Insufficient stock");
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
             orderItem.setQuantity(itemReq.getQuantity());
             orderItem.setPrixUnitaire(product.getPrixUnitaire());
             orderItem.setTotal(product.getPrixUnitaire() * itemReq.getQuantity());
             orderItem.setCommande(commande);
+            product.setStockDisponible(product.getStockDisponible() - itemReq.getQuantity());
             return orderItem;
         }).collect(Collectors.toList());
-
+        CustomerTier tier = client.getNiveauFidelite();
         double sousTotal = items.stream().mapToDouble(OrderItem::getTotal).sum();
-
+        switch (tier) {
+            case BASIC :
+                commande.setRemise(0.00);
+                break;
+            case SILVER :
+                if (sousTotal >= 500)  commande.setRemise(sousTotal*0.05);
+                else commande.setRemise(0.00);
+                break;
+            case GOLD :
+              if(sousTotal >= 800)  commande.setRemise(sousTotal*0.10);
+              else if(sousTotal<800 && sousTotal>=500) commande.setRemise(0.05*sousTotal);
+              else commande.setRemise(0.00);
+              break;
+            case PLATINUM :
+               if(sousTotal >= 1200) commande.setRemise(sousTotal*0.15);
+               else if(sousTotal<1200 && sousTotal>=800) commande.setRemise(0.10*sousTotal);
+               else if(sousTotal<800 && sousTotal>=500) commande.setRemise(0.05*sousTotal);
+               else commande.setRemise(0.00);
+               break;
+        }
         if (request.getCodePromo() != null && !request.getCodePromo().isEmpty()) {
             PromoCode promoCode = promoCodeService.findByCodeAndStatus(request.getCodePromo(), PromoStatus.ACTIVE);
             if (promoCode == null) throw new RuntimeException("Promo code not found or expired");
 
-
+            commande.setRemise(commande.getRemise()+sousTotal*0.05);
             promoCodeService.expirePromoCode(promoCode);
             commande.setCodePromo(promoCode.getCode());
-            commande.setRemise(sousTotal * 0.05);
+
         } else {
-            commande.setRemise(0);
             commande.setCodePromo(null);
         }
-
-        double total = sousTotal - commande.getRemise() + commande.getTva();
+        double tvaAmount = sousTotal * commande.getTva();
+        double total = sousTotal - commande.getRemise() + tvaAmount;
         commande.setListeArticles(items);
         commande.setSousTotal(sousTotal);
         commande.setTotal(total);

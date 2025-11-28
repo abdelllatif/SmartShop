@@ -30,14 +30,14 @@ public class Commande {
 
     private double remise;
 
-    private double tva;
+    private double tva=0.2;
 
     private double total;
 
     private String codePromo;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus statut;
+    private OrderStatus statut=OrderStatus.PENDING;
 
     private double montantRestant;
 }
