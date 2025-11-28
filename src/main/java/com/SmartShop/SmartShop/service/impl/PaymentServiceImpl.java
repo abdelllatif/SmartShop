@@ -5,6 +5,7 @@ import com.SmartShop.SmartShop.dto.PaymentResponse;
 import com.SmartShop.SmartShop.enums.PaymentStatus;
 import com.SmartShop.SmartShop.exception.BadRequestException;
 import com.SmartShop.SmartShop.exception.NotFoundException;
+import com.SmartShop.SmartShop.mapper.PaymentMapper;
 import com.SmartShop.SmartShop.model.Commande;
 import com.SmartShop.SmartShop.model.Payement;
 import com.SmartShop.SmartShop.repository.CommandeRepository;
@@ -21,10 +22,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PayementRepository payementRepository;
     private final CommandeRepository commandeRepository;
+    private final PaymentMapper paymentMapper;
 
-    public PaymentServiceImpl(PayementRepository payementRepository, CommandeRepository commandeRepository) {
+    public PaymentServiceImpl(PayementRepository payementRepository,
+                              CommandeRepository commandeRepository,
+                              PaymentMapper paymentMapper) {
         this.payementRepository = payementRepository;
         this.commandeRepository = commandeRepository;
+        this.paymentMapper = paymentMapper;
     }
 
     @Override
@@ -33,7 +38,6 @@ public class PaymentServiceImpl implements PaymentService {
         Commande commande = commandeRepository.findById(request.getCommandeId())
                 .orElseThrow(() -> new NotFoundException("Commande introuvable"));
 
-        // Calculate montant restant
         double totalPaid = payementRepository.findByCommandeId(commande.getId())
                 .stream()
                 .mapToDouble(Payement::getMontant)
@@ -49,37 +53,23 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BadRequestException("Le montant dépasse le montant restant à payer: " + montantRestant);
         }
 
-        Payement payement = Payement.builder()
-                .commande(commande)
-                .montant(request.getMontant())
-                .typePaiement(request.getTypePaiement().name())
-                .datePaiement(LocalDate.now())
-                .statutPaiement(PaymentStatus.COMPLETE)
-                .build();
+        Payement payement = paymentMapper.toPayement(request);
+        payement.setCommande(commande);
+        payement.setDatePaiement(LocalDate.now());
+        payement.setStatutPaiement(PaymentStatus.COMPLETE);
 
-        payementRepository.save(payement);
+        Payement savedPayment = payementRepository.save(payement);
         commande.setMontantRestant(montantRestant - request.getMontant());
         commandeRepository.save(commande);
 
-        return mapToResponse(payement);
+        return paymentMapper.toPaymentResponse(savedPayment);
     }
 
     @Override
     public List<PaymentResponse> getPaymentsByCommande(Long commandeId) {
         return payementRepository.findByCommandeId(commandeId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(paymentMapper::toPaymentResponse)
                 .collect(Collectors.toList());
-    }
-
-    private PaymentResponse mapToResponse(Payement payement) {
-        PaymentResponse response = new PaymentResponse();
-        response.setId(payement.getId());
-        response.setCommandeId(payement.getCommande().getId());
-        response.setMontant(payement.getMontant());
-        response.setTypePaiement(payement.getTypePaiement().equalsIgnoreCase("CHEQUE") ? com.SmartShop.SmartShop.enums.PaymentType.CHEQUE : com.SmartShop.SmartShop.enums.PaymentType.VIREMENT);
-        response.setDatePaiement(payement.getDatePaiement());
-        response.setStatutPaiement(payement.getStatutPaiement());
-        return response;
     }
 }
