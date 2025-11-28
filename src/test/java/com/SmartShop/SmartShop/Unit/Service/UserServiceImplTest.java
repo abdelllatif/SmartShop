@@ -62,4 +62,14 @@ public class UserServiceImplTest {
     }
 
 
+    @Test
+    void getAllUsers_ShouldReturnUserList() {
+        when(userRepository.findAll()).thenReturn(List.of(user));
+
+        List<User> result = userService.getAllUsers();
+
+        assertEquals(1, result.size());
+        assertEquals("john", result.get(0).getUsername());
+    }
+
 }
