@@ -1,4 +1,45 @@
 package com.SmartShop.SmartShop.Unit.Service;
 
+
+import com.SmartShop.SmartShop.dto.UserRequest;
+import com.SmartShop.SmartShop.enums.UserRole;
+import com.SmartShop.SmartShop.mapper.UserMapper;
+import com.SmartShop.SmartShop.model.User;
+import com.SmartShop.SmartShop.repository.UserRepository;
+import com.SmartShop.SmartShop.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.when;
+
 public class UserServiceImplTest {
+
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    UserMapper userMapper;
+    @InjectMocks
+    private UserService userService;
+
+    private UserRequest request;
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        request = new UserRequest();
+        request.setUsername("justtest");
+        request.setEmail("ana@gmail.com");
+        request.setPassword("12345678");
+        request.setRole(UserRole.CLIENT);
+    }
+
+    public void registerTest_ShouldReturnUserResponse(){
+        when(userMapper.toUser(request)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+
+    }
+
 }
