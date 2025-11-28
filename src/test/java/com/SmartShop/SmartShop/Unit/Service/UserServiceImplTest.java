@@ -69,7 +69,17 @@ public class UserServiceImplTest {
         List<User> result = userService.getAllUsers();
 
         assertEquals(1, result.size());
-        assertEquals("john", result.get(0).getUsername());
+        assertEquals("justtest", result.get(0).getUsername());
+    }
+
+    @Test
+    void getUserById_ShouldReturnUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        Optional<User> result = userService.getUserById(1L);
+
+        assertTrue(result.isPresent());
+        assertEquals("justtest", result.get().getUsername());
     }
 
 }
