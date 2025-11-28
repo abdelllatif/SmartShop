@@ -82,4 +82,14 @@ public class UserServiceImplTest {
         assertEquals("justtest", result.get().getUsername());
     }
 
+    @Test
+    void getUserById_ShouldReturnEmptyOptional_WhenNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Optional<User> result = userService.getUserById(1L);
+
+        assertTrue(result.isEmpty());
+    }
+
+
 }
