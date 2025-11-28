@@ -48,10 +48,18 @@ public class UserServiceImplTest {
         request.setRole(UserRole.CLIENT);
     }
 
-    public void registerTest_ShouldReturnUserResponse(){
-        when(userMapper.toUser(request)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
 
+    @Test
+    void register_ShouldSaveUserAndReturnResponse() {
+        when(userMapper.toUser(request)).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.toUserResponse(user)).thenReturn(new UserResponse());
+
+        UserResponse response = userService.register(request);
+
+        assertNotNull(response);
+        verify(userRepository, times(1)).save(any(User.class));
     }
+
 
 }
