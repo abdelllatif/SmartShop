@@ -1,22 +1,17 @@
 package com.SmartShop.SmartShop.Unit.Service;
 
-
 import com.SmartShop.SmartShop.dto.UserRequest;
 import com.SmartShop.SmartShop.dto.UserResponse;
 import com.SmartShop.SmartShop.enums.UserRole;
 import com.SmartShop.SmartShop.mapper.UserMapper;
-import com.SmartShop.SmartShop.model.Client;
 import com.SmartShop.SmartShop.model.User;
 import com.SmartShop.SmartShop.repository.UserRepository;
-import com.SmartShop.SmartShop.service.UserService;
 import com.SmartShop.SmartShop.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,14 +19,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import static org.mockito.Mockito.when;
-
 public class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
     @Mock
-    UserMapper userMapper;
+    private UserMapper userMapper;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -41,13 +36,22 @@ public class UserServiceImplTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // إعداد UserRequest
         request = new UserRequest();
         request.setUsername("justtest");
         request.setEmail("ana@gmail.com");
         request.setPassword("12345678");
         request.setRole(UserRole.CLIENT);
-    }
 
+        // إعداد User حقيقي لتجنب NullPointer
+        user = new User();
+        user.setId(1L);
+        user.setUsername("justtest");
+        user.setEmail("ana@gmail.com");
+        user.setPassword("12345678");
+        user.setRole(UserRole.CLIENT);
+    }
 
     @Test
     void register_ShouldSaveUserAndReturnResponse() {
@@ -60,7 +64,6 @@ public class UserServiceImplTest {
         assertNotNull(response);
         verify(userRepository, times(1)).save(any(User.class));
     }
-
 
     @Test
     void getAllUsers_ShouldReturnUserList() {
