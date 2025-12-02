@@ -91,5 +91,22 @@ public class UserServiceImplTest {
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    void updateUser_ShouldUpdateAndSaveUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
+        UserRequest updateRequest = new UserRequest();
+        updateRequest.setUsername("testjdid");
+        updateRequest.setEmail("testjdid@gmail.com");
+        updateRequest.setPassword("paasswordnew");
+        updateRequest.setRole(UserRole.ADMIN);
+
+        User updatedUser = userService.updateUser(1L, updateRequest);
+
+        assertEquals("testjdid", updatedUser.getUsername());
+        assertEquals("testjdid@gmail.com", updatedUser.getEmail());
+        assertEquals(UserRole.ADMIN, updatedUser.getRole());
+        verify(userRepository).save(user);
+    }
 }
